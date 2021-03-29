@@ -78,7 +78,7 @@ def login():
 
 
 
-    return "Not implemented", 501
+    #return "Not implemented", 501
 
 
 @app.route('/signup', methods=['POST'])
@@ -138,7 +138,19 @@ def add_room_request(players_id, request_json):
 
 
 def add_room(players_id, pos_x, pos_y, seed):
-    return "Not implemented", 501
+    sql_request = f'''SELECT * FROM rooms 
+    WHERE players_id = "{players_id}"
+    AND rooms_position_x = "{pos_x}"
+    AND rooms_position_x = "{pos_y}"'''
+    player_rooms_info = sql_select(sql_request)
+
+    if len(player_rooms_info) > 0:
+        return "Il y a déjà une room ici", 403
+    else:
+        sql_request = f'''INSERT INTO rooms (rooms_position_x, rooms_position_y, rooms_seed, players_id)
+        VALUES("{pos_x}", "{pos_y}", "{seed}", "{players_id}")'''
+        execute = sql_insert(sql_request)
+        return {"id":execute}, 200
 
 
 @app.route('/users/<int:players_id>/rooms/<int:rooms_id>', methods=['DELETE'])
