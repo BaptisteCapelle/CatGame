@@ -155,12 +155,22 @@ def add_room(players_id, pos_x, pos_y, seed):
 
 @app.route('/users/<int:players_id>/rooms/<int:rooms_id>', methods=['DELETE'])
 def delete_room(players_id, rooms_id):
-    return "Not implemented", 501
+    sql_request = f'''SELECT * FROM cats WHERE rooms_id = "{rooms_id}"'''
+    get_cats = sql_select(sql_request)
+
+    if len(get_cats) > 0:
+        return "Tu en peux pas supprimer car il y a des pauvres petits minouches dans cette room", 403
+    else:
+        sql_request = f'''DELETE FROM rooms WHERE players_id = "{players_id}" AND rooms_id = "{rooms_id}"'''
+        sql_delete(sql_request)
+        return "Ok la room est supprimée du coup !"
 
 
 @app.route('/cats', methods=['GET'])
 def get_free_cats():
-    return "Not implemented", 501
+    sql_request = f'''SELECT * FROM cats WHERE rooms_id IS NULL'''
+    cats_adoptables = sql_select(sql_request)
+    return jsonify(cats_adoptables), 200
 
 
 @app.route('/cats/<int:cats_id>', methods=['PATCH', 'DELETE'])
